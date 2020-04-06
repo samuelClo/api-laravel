@@ -1,25 +1,27 @@
 <template>
     <div>
-        <h1>Home</h1>
+        <AddTask @newTask="newTask"/>
 
-        <p>
-            <router-link :to="{ name: 'home' }">Home</router-link> |
-            <router-link :to="{ name: 'hello' }">Hello World</router-link>
-        </p>
-
-        <div class="container">
-            <router-view></router-view>
-        </div>
-
-        <ul>
+        <ul v-if="Object.keys(tasks).length > 0">
             <li v-for="task in tasks" :key="task.id">
-                {{ task.description }}
+               <Task
+                :description="task.description"
+                :id="task.id"
+
+                @deleteTask="deleteTask"
+                @editTask="editTask"
+                />
             </li>
         </ul>
 
     </div>
 </template>
 <script>
+    import Task from "../components/Task";
+    import AddTask from "../components/AddTask";
+
+    import axios from 'axios';
+
     export default {
         name: 'Home',
         data() {
@@ -28,9 +30,37 @@
             }
         },
         mounted(){
-            fetch('http://127.0.0.1:8000/api/user')
-            .then(rel => rel.json())
-            .then(rel=> this.tasks = rel)
+            this.addTasks()
         },
+        methods:{
+            newTask(description) {
+
+                axios.post('/api/tasks', {description})
+                    .then(rel=> {
+                        alert('Bien ajouté')
+                        this.addTasks()
+                    })
+                    .catch(err => alert(err))
+            },
+            addTasks() {
+                axios.get('/api/tasks')
+                    .then(rel=> this.tasks = rel.data)
+            },
+            deleteTask(id) {
+                axios.delete('/api/tasks/' + id)
+                .then(rel=> {
+                    alert(`delete task ${id}`)
+                    this.addTasks()
+                })
+                .catch(err => alert(err))
+            },
+            editTask(id) {
+                console.log(id)
+            },
+        },
+        components: {
+            Task,
+            AddTask,
+        }
     }
 </script>

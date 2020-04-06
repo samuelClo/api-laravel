@@ -41,7 +41,7 @@ class TaskController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    { //http://127.0.0.1:8000/api/tasks/1
+    {
         return Task::findOrFail($id);
     }
 
